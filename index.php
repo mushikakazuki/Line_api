@@ -15,18 +15,35 @@ $bot = new LINEBot($httpClient, ['channelSecret' => $channelSecret]);
 
 // Webhookからのリクエストを取得
 $input = file_get_contents('php://input');
-error_log("Received input: " . $input);
 $events = json_decode($input, true);
 
 if (!is_null($events['events'])) {
     foreach ($events['events'] as $event) {
+          var_dump($event);
         if ($event['type'] == 'message' && $event['message']['type'] == 'text') {
             $replyToken = $event['replyToken'];
             $text = $event['message']['text'];
-            $responseText = "You said: " . $text;
 
-            // メッセージを送信
-            $textMessageBuilder = new TextMessageBuilder('LINEAPI経由で返信');
+            if(is_numeric($text)) {
+                $responseText = $text * $text;
+            }
+            else {
+              // キーワードに応じた応答
+              switch (strtolower($text)) {
+                  case 'hello':
+                      $responseText = "Hi there!";
+                      break;
+                  case 'bye':
+                      $responseText = "Goodbye!";
+                      break;
+                  default:
+                      $responseText = "You said: " . $text;
+                      break;
+              }
+            }
+          
+          // メッセージを送信
+            $textMessageBuilder = new TextMessageBuilder($responseText);
             $response = $bot->replyMessage($replyToken, $textMessageBuilder);
 
             if (!$response->isSucceeded()) {
