@@ -1,20 +1,21 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
-require_once('./env.php');
+require_once './env.php';
 
 use LINE\LINEBot;
 use LINE\LINEBot\HTTPClient\CurlHTTPClient;
 use LINE\LINEBot\MessageBuilder\TextMessageBuilder;
 
 
-$channelToken = YOUR_CHANNEL_ACCESS_TOKEN;
-$channelSecret = YOUR_CHANNEL_SECRET;
+$channelToken = token;
+$channelSecret = secret;
 
 $httpClient = new CurlHTTPClient($channelToken);
 $bot = new LINEBot($httpClient, ['channelSecret' => $channelSecret]);
 
 // Webhookからのリクエストを取得
 $input = file_get_contents('php://input');
+error_log("Received input: " . $input);
 $events = json_decode($input, true);
 
 if (!is_null($events['events'])) {
@@ -25,7 +26,7 @@ if (!is_null($events['events'])) {
             $responseText = "You said: " . $text;
 
             // メッセージを送信
-            $textMessageBuilder = new TextMessageBuilder($responseText);
+            $textMessageBuilder = new TextMessageBuilder('LINEAPI経由で返信');
             $response = $bot->replyMessage($replyToken, $textMessageBuilder);
 
             if (!$response->isSucceeded()) {
@@ -33,6 +34,9 @@ if (!is_null($events['events'])) {
             }
         }
     }
+} else {
+    error_log('No events received');
 }
 
 echo "OK";
+

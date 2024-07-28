@@ -25,3 +25,4 @@ resources/views/top.blade.php
 .DS_Store
 /public/.htaccess
 env.php
+.vercel
